@@ -2,7 +2,7 @@ module SpectralRegions
 
 using Polynomials
 
-export SpecRegion1d, SpecRegion2d, label, mask_image!, ordermin, ordermax
+export SpecRegion1d, SpecRegion2d, label, mask_image!, ordermin, ordermax, num_orders
 
 struct SpecRegion1d
     pixmin::Union{Nothing, Int}
@@ -37,6 +37,7 @@ end
 
 ordermin(s::SpecRegion2d) = min(s.orderbottom, s.ordertop)
 ordermax(s::SpecRegion2d) = max(s.orderbottom, s.ordertop)
+num_orders(s::SpecRegion2d) = ordermax(s) - ordermin(s) + 1
 
 Base.show(io::IO, s::SpecRegion2d) = println(io, "Echellogram Region: Pixels = $(s.pixmin) - $(s.pixmax), m = $(ordermin(s)) - $(ordermax(s))")
 
@@ -48,13 +49,12 @@ function mask_image!(image, sregion::SpecRegion2d)
     if sregion.pixmax < nx
         image[:, sregion.pixmax+1:end] .= NaN
     end
-    xarr = [1:nx;]
-    ybottom = sregion.poly_bottom.(xarr)
-    ytop = sregion.poly_top.(xarr)
-    yarr = [1:ny;]
-    for i=1:nx
-        bad = findall((yarr .< ybottom[i]) .|| (yarr .> ytop[i]))
-        image[bad, i] .= NaN
+    yarr = 1:ny
+    for x=1:nx
+        ybottom = sregion.poly_bottom(x)
+        ytop = sregion.poly_top(x)
+        bad = findall((yarr .< ybottom) .|| (yarr .> ytop))
+        image[bad, x] .= NaN
     end
 end
 

@@ -228,8 +228,6 @@ function optimize_space!(subspace, p0::Parameters, p0v::Parameters, p0vn::Parame
     γ = 2.0
     σ = 0.5
     δ = 0.5
-
-    #@infiltrate
     
     # Loop
     while true
