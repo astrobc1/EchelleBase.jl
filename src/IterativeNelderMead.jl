@@ -66,7 +66,7 @@ function optimize(optimizer::IterativeNelderMeadOptimizer, p0, obj; ftol_rel=1E-
     n_iterations = length(p0v)
 
     # Max f evals
-    max_f_evals = 800 * length(p0v)
+    max_f_evals = 1200 * length(p0v)
 
     # Subspaces
     subspaces = []
