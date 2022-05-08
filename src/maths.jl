@@ -187,7 +187,7 @@ end
 
 mad(x) = nanmedian(abs.(x .- nanmedian(x)))
 
-function robust_σ(x, nσ=6)
+function robust_σ(x, nσ=4)
     med = nanmedian(x)
     _mad = mad(x)
     good = findall(abs.(x .- med) .< 1.4826 * _mad * nσ)
