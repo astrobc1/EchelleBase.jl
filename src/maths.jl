@@ -54,6 +54,44 @@ function rmsloss(x, y, weights=nothing; flag_worst=0, remove_edges=0)
     return rms
 end
 
+function redchi2loss(x, y, yerr, mask; flag_worst=0, remove_edges=0, ν=nothing)
+
+    # Compute diffs2
+    good = findall(isfinite.(x) .&& isfinite.(y) .&& isfinite.(yerr) .&& (mask .== 1))
+    xx, yy, yyerr, mm = x[good], y[good], yerr[good], mask[good]
+    diffs2 = ((xx .- yy) ./ yyerr).^2
+
+    # Remove edges
+    if remove_edges > 0
+        diffs2[1:remove_edges-1] .= 0
+        diffs2[end-remove_edges+1:end] .= 0
+        mm[1:remove_edges-1] .= 0
+        mm[end-remove_edges+1:end] .= 0
+    end
+    
+    # Ignore worst N pixels
+    if flag_worst > 0
+        ss = sortperm(diffs2)
+        diffs2[ss[end-flag_worst+1:end]] .= 0
+        mm[ss[end-flag_worst+1:end]] .= 0
+    end
+
+    # Degrees of freedom
+    if isnothing(ν)
+        ν = sum(mm) - 2 * remove_edges - flag_worst - 1
+    else
+        ν = ν - 2 * remove_edges - flag_worst
+    end
+
+    @assert ν > 0
+
+    # Compute chi2
+    redχ² = nansum(diffs2) / ν
+
+    # Return
+    return redχ²
+end
+
 
 function doppler_shift_λ(λ, vel, mode="sr")
     if lowercase(mode) == "sr"

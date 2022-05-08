@@ -8,6 +8,8 @@ include("maths.jl")
 const maths = Maths
 export maths
 
+include("parameters.jl")
+
 include("IterativeNelderMead.jl")
 @reexport using .IterativeNelderMead
 
@@ -16,5 +18,7 @@ include("spectralregions.jl")
 
 include("spectraldata.jl")
 @reexport using .SpectralData
+
+include("masking.jl")
 
 end

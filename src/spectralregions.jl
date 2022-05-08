@@ -41,21 +41,4 @@ num_orders(s::SpecRegion2d) = ordermax(s) - ordermin(s) + 1
 
 Base.show(io::IO, s::SpecRegion2d) = println(io, "Echellogram Region: Pixels = $(s.pixmin) - $(s.pixmax), m = $(ordermin(s)) - $(ordermax(s))")
 
-function mask_image!(image, sregion::SpecRegion2d)
-    ny, nx = size(image)
-    if sregion.pixmin > 1
-        image[:, 1:sregion.pixmin-1] .= NaN
-    end
-    if sregion.pixmax < nx
-        image[:, sregion.pixmax+1:end] .= NaN
-    end
-    yarr = 1:ny
-    for x=1:nx
-        ybottom = sregion.poly_bottom(x)
-        ytop = sregion.poly_top(x)
-        bad = findall((yarr .< ybottom) .|| (yarr .> ytop))
-        image[bad, x] .= NaN
-    end
-end
-
 end

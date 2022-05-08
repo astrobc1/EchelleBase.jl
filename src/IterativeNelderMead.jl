@@ -3,47 +3,9 @@ module IterativeNelderMead
 using Statistics, LinearAlgebra
 using DataStructures
 
-export IterativeNelderMeadOptimizer, Parameter, Parameters, optimize
+using EchelleBase
 
-mutable struct Parameter
-    name::Union{String, Nothing}
-    value::Float64
-    lower_bound::Float64
-    upper_bound::Float64
-end
-
-struct Parameters
-    dict::OrderedDict{String, Parameter}
-end
-
-Parameter(;name=nothing, value, lower_bound=-Inf, upper_bound=Inf) = Parameter(name, value, lower_bound, upper_bound)
-Parameters() = Parameters(OrderedDict{String, Parameter}())
-
-Base.length(pars::Parameters) = length(pars.dict)
-Base.merge!(pars::Parameters, pars2::Parameters) = merge!(pars.dict, pars2.dict)
-Base.getindex(pars::Parameters, key::String) = getindex(pars.dict, key)
-Base.firstindex(pars::Parameters) = firstindex(pars.dict)
-Base.lastindex(pars::Parameters) = lastindex(pars.dict)
-Base.iterate(pars::Parameters) = iterate(pars.dict)
-Base.keys(pars::Parameters) = keys(pars.dict)
-Base.values(pars::Parameters) = values(pars.dict)
-
-function Base.setindex!(pars::Parameters, par, key::String)
-    if isnothing(par.name)
-        par.name = key
-    end
-    setindex!(pars.dict, par, key)
-end
-
-function Base.show(io::IO, par::Parameter)
-    println(io, " $(par.name) | Value = $(par.value) | Bounds = [$(par.lower_bound), $(par.upper_bound)]")
-end
-
-function Base.show(io::IO, pars::Parameters)
-    for par ∈ values(pars)
-        show(io, par)
-    end
-end
+export IterativeNelderMeadOptimizer, optimize
 
 struct IterativeNelderMeadOptimizer
 end
