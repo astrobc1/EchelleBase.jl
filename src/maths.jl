@@ -190,6 +190,12 @@ function get_chebvals(x::Real, n::Int)
     return chebvals
 end
 
+function chebval(x::Real, n::Int)
+    coeffs = zeros(n+1)
+    coeffs[n+1] = 1.0
+    return ChebyshevT(coeffs).(x)
+end
+
 mad(x) = nanmedian(abs.(x .- nanmedian(x)))
 
 function robust_σ(x, nσ=4)
