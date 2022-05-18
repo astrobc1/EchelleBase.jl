@@ -170,19 +170,24 @@ function median_filter2d(x, width)
     return x_out
 end
 
-function chebyval2d(x::Real, y::Real, coeffs)
-    numpy = pyimport("numpy")
-    return numpy.polynomial.chebyshev.chebval2d(y, x, coeffs)
-    # n, m = size(coeffs)
-    # s = 0.0
-    # ccpolysx = ccpolys(y, n)
-    # ccpolysy = ccpolys(x, m)
-    # for i=1:n
-    #    for j=1:m
-    #        s += coeffs[i, j] * ccpolysx[i] * ccpolysy[j]
-    #    end
-    # end
-    # return s
+function get_chebvals(pixels::AbstractVector, orders::AbstractVector, max_pixel::Real, max_order::Real, deg_intra_order::Int, deg_inter_order::Int)
+    chebs_pixels = Vector{Float64}[]
+    chebs_orders = Vector{Float64}[]
+    for i=1:length(pixels)
+        push!(chebs_pixels, get_chebvals(pixels[i] / max_pixel, deg_intra_order))
+        push!(chebs_orders, get_chebvals(orders[i] / max_order, deg_inter_order))
+    end
+    return chebs_pixels, chebs_orders
+end
+
+function get_chebvals(x::Real, n::Int)
+    chebvals = zeros(n+1)
+    for i=1:n+1
+        coeffs = zeros(n+1)
+        coeffs[i] = 1.0
+        chebvals[i] = ChebyshevT(coeffs).(x)
+    end
+    return chebvals
 end
 
 mad(x) = nanmedian(abs.(x .- nanmedian(x)))
@@ -195,24 +200,6 @@ function robust_σ(x, nσ=4)
         return nanstd(@view x[good])
     else
         return NaN
-    end
-end
-
-function ccpolys(x::Real, n::Int)
-    T0 = 1
-    T1 = x
-    if n == 0
-        return T0
-    elseif n == 1
-        return T1
-    else
-        Ts = zeros(n+1)
-        Ts[1] = T0
-        Ts[2] = T1
-        for i=3:n+1
-            Ts[i] = 2x * Ts[i-1] - Ts[i-2]
-        end
-        return Ts
     end
 end
 
