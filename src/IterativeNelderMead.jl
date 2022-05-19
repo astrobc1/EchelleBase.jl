@@ -348,7 +348,6 @@ function penalize(f, ptest, names)
 end
 
 function compute_obj(x::Vector{Float64}, subspace, ptestn, p0, obj, fcalls::Ref{Int})
-    #@infiltrate
     fcalls[] += 1
     for i=1:length(subspace.names)
         ptestn[subspace.names[i]].value = x[i]
