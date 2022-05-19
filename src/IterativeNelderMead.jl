@@ -2,6 +2,7 @@ module IterativeNelderMead
 
 using Statistics, LinearAlgebra
 using DataStructures
+using Infiltrator
 
 using EchelleBase
 
@@ -94,7 +95,7 @@ function optimize(optimizer::IterativeNelderMeadOptimizer, p0, obj; ftol_rel=1E-
 
     # Initial solution
     pbest = Ref(deepcopy(p0))
-    fbest = Ref(obj(p0))
+    fbest = Ref(float(obj(p0)))
 
     # Fcalls
     fcalls = Ref(0)
@@ -347,6 +348,7 @@ function penalize(f, ptest, names)
 end
 
 function compute_obj(x::Vector{Float64}, subspace, ptestn, p0, obj, fcalls::Ref{Int})
+    #@infiltrate
     fcalls[] += 1
     for i=1:length(subspace.names)
         ptestn[subspace.names[i]].value = x[i]
