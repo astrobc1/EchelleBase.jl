@@ -173,6 +173,7 @@ end
 function get_chebvals(pixels::AbstractVector, orders::AbstractVector, max_pixel::Real, max_order::Real, deg_intra_order::Int, deg_inter_order::Int)
     chebs_pixels = Vector{Float64}[]
     chebs_orders = Vector{Float64}[]
+    @assert length(pixels) == length(orders)
     for i=1:length(pixels)
         push!(chebs_pixels, get_chebvals(pixels[i] / max_pixel, deg_intra_order))
         push!(chebs_orders, get_chebvals(orders[i] / max_order, deg_inter_order))
