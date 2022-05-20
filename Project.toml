@@ -3,6 +3,9 @@ uuid = "fb2f92b1-9968-41b4-8835-2765b866fa7d"
 authors = ["Bryson Cale <bryson.cale1@gmail.com>"]
 version = "0.1.0"
 
+[compat]
+julia = "1.7.2"
+
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataInterpolations = "82cc6244-b520-54b8-b5a6-8a565e85f1d0"
