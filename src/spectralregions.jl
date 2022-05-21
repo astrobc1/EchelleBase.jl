@@ -1,8 +1,8 @@
 module SpectralRegions
 
-using Polynomials
+export SpecRegion1d, SpecRegion2d, label, ordermin, ordermax, num_orders
 
-export SpecRegion1d, SpecRegion2d, label, mask_image!, ordermin, ordermax, num_orders
+using Polynomials
 
 struct SpecRegion1d
     pixmin::Union{Nothing, Int}

@@ -1,11 +1,10 @@
 module Maths
 
-using DataInterpolations
+import DataInterpolations
 using NaNStatistics
 using LoopVectorization
 using StatsBase
 using Polynomials
-using PyCall
 
 const SPEED_OF_LIGHT_MPS = 299792458.0
 const TWO_SQRT_2LOG2 = 2 * sqrt(2 * log(2))

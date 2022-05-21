@@ -1,4 +1,4 @@
-using DataStructures
+import DataStructures: OrderedDict
 
 export Parameter, Parameters, num_varied, is_varied
 
