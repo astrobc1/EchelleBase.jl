@@ -1,6 +1,6 @@
 module SpectralData
 
-import EchelleBase
+using EchelleBase
 
 using FITSIO
 using DataFrames
