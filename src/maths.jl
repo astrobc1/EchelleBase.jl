@@ -4,6 +4,7 @@ import DataInterpolations
 using NaNStatistics
 using LoopVectorization
 using StatsBase
+using Infiltrator
 using Polynomials
 
 const SPEED_OF_LIGHT_MPS = 299792458.0
@@ -196,14 +197,37 @@ function chebval(x::Real, n::Int)
     return ChebyshevT(coeffs).(x)
 end
 
-mad(x) = nanmedian(abs.(x .- nanmedian(x)))
-
-function robust_σ(x, nσ=4)
-    med = nanmedian(x)
-    _mad = mad(x)
-    good = findall(abs.(x .- med) .< 1.4826 * _mad * nσ)
+function robust_σ(x; w=nothing, nσ=4)
+    med = weighted_median(x, w=w)
+    adevs = abs.(med .- x)
+    mad = weighted_median(adevs, w=w)
+    good = findall(adevs .< 1.4826 * mad * nσ)
     if length(good) > 1
         return nanstd(@view x[good])
+    else
+        return NaN
+    end
+end
+
+function robust_stats(x; w=nothing, nσ=4)
+    med = weighted_median(x, w=w)
+    adevs = abs.(med .- x)
+    mad = weighted_median(adevs, w=w)
+    good = findall(adevs .< 1.4826 * mad * nσ)
+    if length(good) > 1
+        return nanmean(@view x[good]), nanstd(@view x[good])
+    else
+        return NaN, NaN
+    end
+end
+
+function robust_μ(x; w=nothing, nσ=4)
+    med = weighted_median(x, w=w)
+    adevs = abs.(med .- x)
+    mad = weighted_median(adevs, w=w)
+    good = findall(adevs .< 1.4826 * mad * nσ)
+    if length(good) > 1
+        return nanmean(@view x[good])
     else
         return NaN
     end
@@ -294,12 +318,12 @@ end
 
 function weighted_stddev(x, w)
     good = findall(isfinite.(x) .&& (w .> 0) .&& isfinite.(w))
-    xx = @view x[good]
-    ww = @view w[good]
-    ww = ww ./ sum(w)
+    xx = x[good]
+    ww = w[good]
+    ww ./= sum(ww)
     μ = weighted_mean(xx, ww)
     dev = xx .- μ
-    bias_estimator = 1.0 - sum(ww.^2) / sum(ww)^2
+    bias_estimator = 1.0 - sum(ww.^2)
     var = sum(dev .^2 .* ww) / bias_estimator
     return sqrt(var)
 end
@@ -393,9 +417,21 @@ end
 # dl / l0 + 1 = e^(dv/c)
 # ln(dl / l0 + 1) = dv/c
 # c * ln(dl / l0 - 1) = dv
-function δλ2δv(δλ, λ)
-    return @. SPEED_OF_LIGHT_MPS * log(δλ / λ + 1)
+function δλ2δv(δλ::Real, λ::Real)
+    x = δλ / λ + 1
+    if x > 0
+        return SPEED_OF_LIGHT_MPS * log(x)
+    else
+        return NaN
+    end
 end
+
+# function δλ2δv(δλ, λ)
+#     x = δλ ./ λ .+ 1
+#     bad = findall(x .<= 0)
+#     x[bad] .= NaN
+#     return @. SPEED_OF_LIGHT_MPS * log(x)
+# end
 
 # dl = l0 * (e^(dv/c) - 1)
 function δv2δλ(δv, λ)
