@@ -243,7 +243,7 @@ function convolve1d(x, k)
     valright = x[end]
     
     # Left values
-    for i=1:n_pad
+    @inbounds for i=1:n_pad
         s = 0.0
         for j=1:nk
             ii = i - n_pad + j + 1
@@ -266,7 +266,7 @@ function convolve1d(x, k)
     end
 
     # Right values
-    for i=nx-n_pad+1:nx
+    @inbounds for i=nx-n_pad+1:nx
         s = 0.0
         for j=1:nk
             ii = i - n_pad + j + 1
@@ -449,6 +449,19 @@ function generalized_median_filter1d(x; width, p=0.5)
         end
     end
     return y
+end
+
+function cross_correlate_doppler(λ1, f1, λ2, f2, vels)
+    xc = fill(NaN, length(vels))
+    vec_cross = fill(NaN, length(f1))
+    for i=1:length(vels)
+        f2s = doppler_shift_flux(λ2, f2, vels[i])
+        f2s = lin_interp(λ2, f2s, λ1)
+        vec_cross .= f1 .* f2s
+        good = findall(isfinite.(vec_cross))
+        xc[i] = nansum(vec_cross[good])
+    end
+    return xc
 end
 
 end
