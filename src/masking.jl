@@ -26,7 +26,7 @@ function mask!(data::SpecData1d, sregion::SpecRegion1d)
     data.data.mask[bad] .= 0
 end
 
-function mask!(image::AbstractMatrix, sregion::SpecRegion2d)
+function mask!(image::AbstractMatrix{<:Number}, sregion::SpecRegion2d)
     ny, nx = size(image)
     if sregion.pixmin > 1
         image[:, 1:sregion.pixmin-1] .= NaN

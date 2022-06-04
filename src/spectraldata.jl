@@ -7,12 +7,36 @@ using DataFrames
 
 export SpecData, SpecData1d, SpecData2d, RawSpecData2d, Echellogram, get_spectrograph, get_spec_module, MasterCal2d, read_header, read_image, read_spec1d, parse_exposure_start_time, parse_itime, parse_object, parse_sky_coord, parse_utdate, get_exposure_midpoint, get_barycentric_velocity, get_barycentric_corrections, get_λsolution_estimate, normalize!
 
+"""
+An abstract type for all spectral data, both 2d echellograms and extracted 1d spectra, parametrized by the spectrograph S.
+"""
 abstract type SpecData{S} end
+
+"""
+An abstract type for all 2d spectral data (echellograms), parametrized by the spectrograph S.
+"""
 abstract type SpecData2d{S} <: SpecData{S} end
 
-get_spectrograph(data::SpecData) = String(typeof(data).parameters[1])
-get_spec_module(::SpecData{T}) where {T} = nothing
+"""
+    get_spectrograph(data::SpecData{S})
+Returns the name of the spectrograph as a string corresponding to this SpecData object.
+"""
+get_spectrograph(data::SpecData{S}) where {S} = String(typeof(data).parameters[1])
 
+"""
+    get_spec_module(data::SpecData{S})
+Returns the module for this spectrograph.
+"""
+function get_spec_module(::SpecData{S}) where {S} end
+
+"""
+A SpecData1d.
+
+# Fields
+- fname: The starting pixel.
+- header: The ending pixel.
+- data: DataFrame.
+"""
 struct SpecData1d{S} <: SpecData{S}
     fname::String
     header::FITSHeader

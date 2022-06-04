@@ -7,13 +7,17 @@ mutable struct Parameter
     value::Float64
     lower_bound::Float64
     upper_bound::Float64
+    latex_str::Union{String, Nothing}
 end
 
 struct Parameters
     dict::OrderedDict{String, Parameter}
 end
 
-Parameter(;name=nothing, value, lower_bound=-Inf, upper_bound=Inf) = Parameter(name, value, lower_bound, upper_bound)
+"""Construct a new parameter"""
+Parameter(;name=nothing, value::Real, lower_bound::Real=-Inf, upper_bound::Real=Inf, latex_str=nothing) = Parameter(name, value, lower_bound, upper_bound, latex_str)
+
+"""Construct an empty Parameters struct"""
 Parameters() = Parameters(OrderedDict{String, Parameter}())
 
 Base.length(pars::Parameters) = length(pars.dict)
@@ -25,10 +29,17 @@ Base.iterate(pars::Parameters) = iterate(pars.dict)
 Base.keys(pars::Parameters) = keys(pars.dict)
 Base.values(pars::Parameters) = values(pars.dict)
 
-function Base.setindex!(pars::Parameters, par::Parameter, key::String)
+function set_name!(par::Parameter, name::String)
     if isnothing(par.name)
         par.name = key
     end
+    if isnothing(par.latex_str)
+        par.latex_str = name
+    end
+end
+
+function Base.setindex!(pars::Parameters, par::Parameter, key::String)
+    set_name!(par, name)
     setindex!(pars.dict, par, key)
 end
 
