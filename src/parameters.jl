@@ -31,7 +31,7 @@ Base.values(pars::Parameters) = values(pars.dict)
 
 function set_name!(par::Parameter, name::String)
     if isnothing(par.name)
-        par.name = key
+        par.name = name
     end
     if isnothing(par.latex_str)
         par.latex_str = name
@@ -39,7 +39,7 @@ function set_name!(par::Parameter, name::String)
 end
 
 function Base.setindex!(pars::Parameters, par::Parameter, key::String)
-    set_name!(par, name)
+    set_name!(par, key)
     setindex!(pars.dict, par, key)
 end
 

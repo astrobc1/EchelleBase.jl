@@ -94,7 +94,7 @@ function redχ2loss(residuals::AbstractArray{<:Real}, errors::AbstractArray{<:Re
     @assert ν > 0
 
     # Compute chi2
-    redχ² = nansum(diffs2) / ν
+    redχ² = nansum((residuals ./ errors).^2) / ν
 
     # Return
     return redχ²
@@ -183,7 +183,7 @@ end
     median_filter2d(x::AbstractVector, width::Real)
 A standard median filter where x_out[i, j] = median(x[i-w2:i+w2, j-w2:j+w2]) where w2 = floor(width / 2).
 """
-function median_filter2d(x::AbstractVector, width::Real)
+function median_filter2d(x::AbstractMatrix, width::Real)
     @assert isodd(width)
     ny, nx = size(x)
     x_out = fill(NaN, (ny, nx))
@@ -210,17 +210,27 @@ function chebval(x::Real, n::Int)
     return ChebyshevT(coeffs).(x)
 end
 
+function get_weights(x)
+    w = ones(size(x))
+    bad = findall(.~isfinite.(x))
+    w[bad] .= NaN
+    return w
+end
+
 """
     robust_σ(x::AbstractArray; [w::AbstractArray] nσ::Real=4)
 Computes a robust standard deviation value by flagging values through the median absolute deviation. 
 """
-function robust_σ(x::AbstractArray; w=Union{Nothing, AbstractArray}, nσ::Real=4)
+function robust_σ(x::AbstractArray; w::Union{Nothing, AbstractArray}=nothing, nσ::Real=4)
+    if isnothing(w)
+        w = get_weights(x)
+    end
     med = weighted_median(x, w=w)
     adevs = abs.(med .- x)
     mad = weighted_median(adevs, w=w)
     good = findall(adevs .< 1.4826 * mad * nσ)
     if length(good) > 1
-        return nanstd(@view x[good])
+        return @views weighted_stddev(x[good], w[good])
     else
         return NaN
     end
@@ -230,7 +240,10 @@ end
     robust_σ(x::AbstractArray; [w::AbstractArray] nσ::Real=4)
 Computes a robust standard mean and deviation value by flagging values through the median absolute deviation. 
 """
-function robust_stats(x; w=nothing, nσ=4)
+function robust_stats(x::AbstractArray; w::Union{Nothing, AbstractArray}=nothing, nσ::Real=4)
+    if isnothing(w)
+        w = get_weights(x)
+    end
     med = weighted_median(x, w=w)
     adevs = abs.(med .- x)
     mad = weighted_median(adevs, w=w)
@@ -246,7 +259,10 @@ end
     robust_σ(x::AbstractArray; [w::AbstractArray] nσ::Real=4)
 Computes a robust standard mean value by flagging values through the median absolute deviation. 
 """
-function robust_μ(x; w=nothing, nσ=4)
+function robust_μ(x::AbstractArray; w::Union{Nothing, AbstractArray}=nothing, nσ::Real=4)
+    if isnothing(w)
+        w = get_weights(x)
+    end
     med = weighted_median(x, w=w)
     adevs = abs.(med .- x)
     mad = weighted_median(adevs, w=w)
@@ -369,37 +385,37 @@ function weighted_median(x; w=nothing, p=0.5)
     end
 end
 
-# function cross_correlate_interp(x1, y1, x2, y2, lags; kind="rms")
+function cross_correlate_interp(x1, y1, x2, y2, lags; kind="rms")
 
-#     # Shifts y2 and compares it to y1
-#     nx1 = length(x1)
-#     nx2 = length(x2)
+    # Shifts y2 and compares it to y1
+    nx1 = length(x1)
+    nx2 = length(x2)
   
-#     nlags = length(lags)
-#     kind = lowercase(kind)
+    nlags = length(lags)
+    kind = lowercase(kind)
     
-#     ccf = fill(NaN, nlags)
-#     y2_shifted = fill(NaN, nx1)
-#     weights = ones(nx1)
-#     for i=1:nlags
-#         y2_shifted .= lin_interp(x2 .+ lags[i], y2, x1)
-#         good = findall(isfinite.(y1) .&& isfinite.(y2_shifted))
-#         if length(good) < 3
-#             continue
-#         end
-#         weights .= 1
-#         bad = findall(.~isfinite.(y1) .|| .~isfinite.(y2_shifted))
-#         weights[bad] .= 0
-#         if kind == "rms"
-#             ccf[i] = sqrt(nansum(weights .* (y1 .- y2_shifted).^2) / nansum(weights))
-#         else
-#             ccf[i] = nansum(y1 .* y2_shifted .* weights) / nansum(weights)
-#         end
-#     end
+    ccf = fill(NaN, nlags)
+    y2_shifted = fill(NaN, nx1)
+    weights = ones(nx1)
+    for i=1:nlags
+        y2_shifted .= lin_interp(x2 .+ lags[i], y2, x1)
+        good = findall(isfinite.(y1) .&& isfinite.(y2_shifted))
+        if length(good) < 3
+            continue
+        end
+        weights .= 1
+        bad = findall(.~isfinite.(y1) .|| .~isfinite.(y2_shifted))
+        weights[bad] .= 0
+        if kind == "rms"
+            ccf[i] = sqrt(nansum(weights .* (y1 .- y2_shifted).^2) / nansum(weights))
+        else
+            ccf[i] = nansum(y1 .* y2_shifted .* weights) / nansum(weights)
+        end
+    end
 
-#     return ccf
+    return ccf
 
-# end
+end
 
 
 function nanargmaximum(x)
