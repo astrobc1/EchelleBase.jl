@@ -1,5 +1,7 @@
 import DataStructures: OrderedDict
 
+import DataFrames: DataFrame
+
 export Parameter, Parameters, num_varied, is_varied
 
 mutable struct Parameter
@@ -7,6 +9,7 @@ mutable struct Parameter
     value::Float64
     lower_bound::Float64
     upper_bound::Float64
+    vary::Bool
     latex_str::Union{String, Nothing}
 end
 
@@ -15,7 +18,12 @@ struct Parameters
 end
 
 """Construct a new parameter"""
-Parameter(;name=nothing, value::Real, lower_bound::Real=-Inf, upper_bound::Real=Inf, latex_str=nothing) = Parameter(name, value, lower_bound, upper_bound, latex_str)
+function Parameter(;name=nothing, value::Real, lower_bound::Real=-Inf, upper_bound::Real=Inf, vary=true, latex_str=nothing)
+    if lower_bound == upper_bound
+        vary = false
+    end
+    return Parameter(name, value, lower_bound, upper_bound, vary, latex_str)
+end
 
 """Construct an empty Parameters struct"""
 Parameters() = Parameters(OrderedDict{String, Parameter}())
@@ -64,5 +72,14 @@ function num_varied(pars::Parameters)
 end
 
 function is_varied(par::Parameter)
-    return par.lower_bound == par.upper_bound
+    return (par.lower_bound == par.upper_bound) || par.vary
+end
+
+function to_df(pars::Parameters)
+    df = DataFrame()
+    df.values = Float64[par.value for par ∈ values(pars)]
+    df.lower_bounds = Float64[par.lower_bound for par ∈ values(pars)]
+    df.upper_bounds = Float64[par.upper_bound for par ∈ values(pars)]
+    df.varied = BitVector([is_varied(par) for par ∈ values(pars)])
+    df.latex_str = String[par.latex_str for par ∈ values(pars)]
 end
