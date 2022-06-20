@@ -25,7 +25,6 @@ function mask!(data::SpecData1d, sregion::SpecRegion1d)
         data.data.mask[bad] .= 0
     else
         bad = findall(.~isfinite.(data.data.flux) .|| .~isfinite.(data.data.fluxerr) .|| (data.data.mask .== 0) .|| (data.data.flux .<= 0))
-        data.data.λ[bad] .= NaN
         data.data.flux[bad] .= NaN
         data.data.fluxerr[bad] .= NaN
         data.data.mask[bad] .= 0
