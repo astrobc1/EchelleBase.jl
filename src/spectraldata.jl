@@ -93,6 +93,9 @@ Base.show(io::IO, d::SpecData1d) = print(io, "SpecData1d: $(basename(d.fname))")
 Base.show(io::IO, d::RawSpecData2d) = print(io, "RawSpecData2d: $(basename(d.fname))")
 Base.show(io::IO, d::MasterCal2d) = print(io, "MasterCal2d: $(basename(d.fname))")
 
+# Equality
+Base.:(==)(d1::SpecData{T}, d2::SpecData{V}) where {T, V} = d1.fname == d2.fname;
+
 # Reading in header
 function read_header end
 
