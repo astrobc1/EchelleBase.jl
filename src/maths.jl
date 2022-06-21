@@ -155,6 +155,8 @@ struct CubicSpline{uType,tType,hType,zType,FT,T}
     z::zType
     CubicSpline{FT}(t,u,h,z) where FT = new{typeof(t),typeof(u),typeof(h),typeof(z),FT,eltype(u)}(t,u,h,z)
 end
+
+(A::CubicSpline)(t) = _interpolate(A, t)
   
 function CubicSpline(t, u::uType) where {uType<:AbstractVector{<:Number}}
     n = length(t) - 1
@@ -189,12 +191,13 @@ function _interpolate(A::CubicSpline{<:AbstractVector}, t::Number)
 end
 
 
-
 struct LinearInterpolation{uType,tType,FT,T}
     t::tType
     u::uType
     LinearInterpolation{FT}(t, u) where FT = new{typeof(t), typeof(u),FT,eltype(u)}(t,u)
 end
+
+(A::LinearInterpolation)(t) = _interpolate(A, t)
   
 function LinearInterpolation(t, u)
     LinearInterpolation{true}(t, u)
