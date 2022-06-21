@@ -2,6 +2,7 @@ module Maths
 
 using LoopVectorization
 using StatsBase
+using LinearAlgebra
 using NaNStatistics
 using Polynomials
 
