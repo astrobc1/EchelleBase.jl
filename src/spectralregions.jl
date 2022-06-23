@@ -1,6 +1,6 @@
 module SpectralRegions
 
-export SpecRegion1d, SpecRegion2d, label, ordermin, ordermax, num_orders
+export SpecRegion1d, SpecRegion2d, label, num_orders
 
 using Polynomials
 
