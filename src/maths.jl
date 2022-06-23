@@ -246,7 +246,7 @@ function derivative(A::CubicSpline{<:AbstractVector}, t::Number)
 
 function lin_interp(x, y, xnew)
     good = findall(isfinite.(x) .&& isfinite.(y))
-    A = LinearInterpolation(x[good], y[good])
+    A = LinearInterpolation(float.(x[good]), float.(y[good]))
     good = findall(xnew .>= x[good[1]] .&& xnew .<= x[good[end]])
     ynew = fill(NaN, length(xnew))
     for i ∈ eachindex(good)
@@ -599,6 +599,16 @@ function generalized_median_filter1d(x; width, p=0.5)
         end
     end
     return y
+end
+
+function get_chebvals(x::Real, n::Int)
+    chebvals = zeros(n+1)
+    for i=1:n+1
+        coeffs = zeros(n+1)
+        coeffs[i] = 1.0
+        chebvals[i] = ChebyshevT(coeffs).(x)
+    end
+    return chebvals
 end
 
 

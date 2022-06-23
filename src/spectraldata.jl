@@ -105,6 +105,12 @@ function read_image end
 # Reading in 1d spectrum
 function read_spec1d end
 
+# Orders
+function orderbottom end
+function ordertop end
+ordermin(d::SpecData) = min(orderbottom(d), ordertop(d))
+ordermax(d::SpecData) = max(orderbottom(d), ordertop(d))
+
 # Parsing
 function parse_itime end
 function parse_object end
