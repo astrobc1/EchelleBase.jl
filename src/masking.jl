@@ -1,7 +1,11 @@
 export mask!
 
+"""
+    mask!(data::SpecData1d, sregion::SpecRegion1d)
+Mask bad pixels in-place according to the variables data.data.λ, data.data.flux, data.data.fluxerr, data.data.mask, as well as the bounding pixels in sregion (not wavelength).
+"""
 function mask!(data::SpecData1d, sregion::SpecRegion1d)
-    if sregion.pixmin > 1
+    if !isnothing(sregion.pixmin) && sregion.pixmin > 1
         if hasproperty(data.data, :λ)
             data.data.λ[1:sregion.pixmin-1] .= NaN
         end
@@ -9,7 +13,7 @@ function mask!(data::SpecData1d, sregion::SpecRegion1d)
         data.data.fluxerr[1:sregion.pixmin-1] .= NaN
         data.data.mask[1:sregion.pixmin-1] .= 0
     end
-    if sregion.pixmax < length(data.data.flux)
+    if !isnothing(sregion.pixmax) && sregion.pixmax < length(data.data.flux)
         if hasproperty(data.data, :λ)
             data.data.λ[sregion.pixmax+1:end] .= NaN
         end
@@ -31,6 +35,10 @@ function mask!(data::SpecData1d, sregion::SpecRegion1d)
     end
 end
 
+"""
+    mask!(image::AbstractMatrix{<:Number}, sregion::SpecRegion2d)
+Mask bad pixels in-place according to the bounding polynomials and left/right ends.
+"""
 function mask!(image::AbstractMatrix{<:Number}, sregion::SpecRegion2d)
     ny, nx = size(image)
     if sregion.pixmin > 1
