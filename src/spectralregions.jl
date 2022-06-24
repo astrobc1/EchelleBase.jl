@@ -1,11 +1,11 @@
 module SpectralRegions
 
-export SpecRegion1d, SpecRegion2d, label, num_orders
+export SpecRegion1d, SpecRegion2d
 
 using Polynomials
 
 """
-A SpecRegion1d.
+A container for 1d spectral regions for reduced spectra.
 
 # Fields
 - pixmin: The starting pixel.
@@ -39,7 +39,7 @@ end
 Base.show(io::IO, s::SpecRegion1d) = println(io, "$(label(s)): Pixels = $(s.pixmin) - $(s.pixmax), λ = $(round(s.λmin, digits=4)) - $(round(s.λmax, digits=4)) nm")
 
 """
-A SpecRegion2d.
+A container for 2d spectral regions for echellograms.
 
 # Fields
 - pixmin: The starting pixel in the spectral direction.
@@ -49,7 +49,7 @@ A SpecRegion2d.
 - poly_bottom: The bottom bounding polynomial.
 - poly_top: The top bounding polynomial.
 """
-Base.@kwdef struct SpecRegion2d
+struct SpecRegion2d
     pixmin::Int
     pixmax::Int
     orderbottom::Int
@@ -60,7 +60,10 @@ end
 
 ordermin(s::SpecRegion2d) = min(s.orderbottom, s.ordertop)
 ordermax(s::SpecRegion2d) = max(s.orderbottom, s.ordertop)
-num_orders(s::SpecRegion2d) = ordermax(s) - ordermin(s) + 1
+
+function SpecRegion2d(;pixmin, pixmax, orderbottom, ordertop, poly_bottom, poly_top)
+    return SpecRegion2d(pixmin, pixmax, orderbottom, ordertop, poly_bottom, poly_top)
+end
 
 Base.show(io::IO, s::SpecRegion2d) = println(io, "Echellogram Region: Pixels = $(s.pixmin) - $(s.pixmax), m = $(ordermin(s)) - $(ordermax(s))")
 

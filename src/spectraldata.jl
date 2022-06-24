@@ -5,7 +5,14 @@ using EchelleBase
 using FITSIO
 using DataFrames
 
-export SpecData, SpecData1d, SpecData2d, RawSpecData2d, Echellogram, get_spectrograph, get_spec_module, MasterCal2d, read_header, read_image, read_spec1d, parse_exposure_start_time, parse_itime, parse_object, parse_sky_coord, parse_utdate, get_exposure_midpoint, get_barycentric_velocity, get_barycentric_corrections, get_λsolution_estimate, normalize!, ordermin, ordermax, orderbottom, ordertop
+# Exports
+export SpecData, SpecData1d, SpecData2d, Echellogram, RawSpecData2d, MasterCal2d
+export get_spectrograph, get_spec_module
+export read_header, read_image, read_spec1d
+export ordermin, ordermax, orderbottom, ordertop
+export parse_exposure_start_time, parse_itime, parse_object, parse_sky_coord, parse_utdate
+export get_exposure_midpoint, get_barycentric_velocity, get_barycentric_corrections
+export get_λsolution_estimate, normalize!
 
 """
 An abstract type for all spectral data, both 2d echellograms and extracted 1d spectra, parametrized by the spectrograph S.
@@ -96,13 +103,9 @@ Base.show(io::IO, d::MasterCal2d) = print(io, "MasterCal2d: $(basename(d.fname))
 # Equality
 Base.:(==)(d1::SpecData{T}, d2::SpecData{V}) where {T, V} = d1.fname == d2.fname;
 
-# Reading in header
+# Reading in header and data products
 function read_header end
-
-# Reading in image
 function read_image end
-
-# Reading in 1d spectrum
 function read_spec1d end
 
 # Orders
@@ -110,8 +113,9 @@ function orderbottom end
 function ordertop end
 ordermin(d::SpecData) = min(orderbottom(d), ordertop(d))
 ordermax(d::SpecData) = max(orderbottom(d), ordertop(d))
+num_orders(d::SpecData) = ordermax(d) - ordermin(d)
 
-# Parsing
+# Parsing header and/or filename info
 function parse_itime end
 function parse_object end
 function parse_utdate end
@@ -119,7 +123,7 @@ function parse_sky_coord end
 function parse_exposure_start_time end
 function parse_image_num end
 
-# Barycenter
+# Barycenter calculations
 function get_exposure_midpoint end
 function get_barycentric_velocity end
 function get_barycentric_corrections end
@@ -127,5 +131,5 @@ function get_barycentric_corrections end
 # Wavelength info
 function get_λsolution_estimate end
 
-
+# End module
 end
