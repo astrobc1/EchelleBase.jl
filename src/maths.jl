@@ -53,8 +53,8 @@ function rmsloss(residuals::AbstractArray{<:Real}, weights::Union{AbstractArray{
 end
 
 """
-    redχ2loss(residuals::AbstractArray{<:Real}, [weights::AbstractArray{<:Real}=nothing]; flag_worst::Int=0, remove_edges::Int=0)
-Computes the reduced chi square loss. Weights can also be provided, otherwise uniform weights will be used.
+    redχ2loss(residuals::AbstractArray{<:Real}, [errors::AbstractArray{<:Real}=nothing]; flag_worst::Int=0, remove_edges::Int=0)
+Computes the reduced chi square loss.
 """
 function redχ2loss(residuals::AbstractArray{<:Real}, errors::AbstractArray{<:Real}, mask::AbstractArray{<:Real}=nothing; flag_worst=0, remove_edges=0, ν=nothing)
 
