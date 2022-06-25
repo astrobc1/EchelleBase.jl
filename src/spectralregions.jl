@@ -1,6 +1,6 @@
 module SpectralRegions
 
-export SpecRegion1d, SpecRegion2d
+export SpecRegion1d, SpecRegion2d, label
 
 using Polynomials
 
