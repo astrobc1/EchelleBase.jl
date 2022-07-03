@@ -195,7 +195,7 @@ end
     chebval(x::Real, n::Int)
 Computes the Chebyshev polynomial of degree n at value x.
 """
-function chebval(x::Real, n::Int)
+function chebyval(x::Real, n::Int)
     coeffs = zeros(n+1)
     coeffs[n+1] = 1.0
     return ChebyshevT(coeffs).(x)
@@ -494,7 +494,7 @@ function generalized_median_filter1d(x; width, p=0.5)
     return y
 end
 
-function get_chebvals(x::Real, n::Int)
+function get_chebyvals(x::Real, n::Int)
     chebvals = zeros(n+1)
     for i=1:n+1
         coeffs = zeros(n+1)

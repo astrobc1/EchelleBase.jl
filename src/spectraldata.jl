@@ -10,7 +10,7 @@ export SpecData, SpecData1d, SpecData2d, Echellogram, RawSpecData2d, MasterCal2d
 export get_spectrograph, get_spec_module
 export read_header, read_image, read_spec1d
 export ordermin, ordermax, orderbottom, ordertop
-export parse_exposure_start_time, parse_itime, parse_object, parse_sky_coord, parse_utdate
+export parse_exposure_start_time, parse_itime, parse_object, parse_sky_coord, parse_utdate, parse_airmass
 export get_exposure_midpoint, get_barycentric_velocity, get_barycentric_corrections
 export get_λsolution_estimate, normalize!
 
@@ -218,6 +218,12 @@ function parse_sky_coord end
 Parses the exposure start time for a given exposure.
 """
 function parse_exposure_start_time end
+
+"""
+    parse_airmass
+Parses the airmass for a given exposure.
+"""
+function parse_airmass end
 
 """
     parse_image_num
