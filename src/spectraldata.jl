@@ -51,7 +51,11 @@ struct SpecData1d{S} <: SpecData{S}
 end
 
 
-function SpecData1d(fname::String, spectrograph, sregion::SpecRegion1d)
+"""
+    SpecData1d(fname::String, spectrograph::String, sregion::SpecRegion1d)
+Construct a `SpecData1d` object for the filename `fname` for the spectral region `sregion`. lowercase(`spectrograph`) must be a recognized name.
+"""
+function SpecData1d(fname::String, spectrograph::String, sregion::SpecRegion1d)
     data = SpecData1d{Symbol(lowercase(spectrograph))}(fname, FITSHeader(String[], [], String[]), DataFrame())
     header = read_header(data)
     data.header.keys = header.keys
